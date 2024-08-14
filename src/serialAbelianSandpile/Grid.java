@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 
 //This class is for the grid for the Abelian Sandpile cellular automaton
 public class Grid {
-	private int rows, columns;
+	private int rows, columns, cutoff;
 	private int[][] grid; // grid
 	private int[][] updateGrid;// grid for next time step
 	public static final ForkJoinPool pool = ForkJoinPool.commonPool();
@@ -27,6 +27,7 @@ public class Grid {
 				updateGrid[i][j] = 0;
 			}
 		}
+		cutoff = 40;// constant cutoff/threshold
 	}
 
 	public Grid(int[][] newGrid) {
@@ -81,18 +82,9 @@ public class Grid {
 
 	// key method to calculate the next update grod
 	boolean update() {
-		boolean change = false;
-		updateGridTask task = new updateGridTask(rows, columns, grid, updateGrid, 1, columns - 1);
-		pool.invoke(task);
+		updateGridTask task = new updateGridTask(rows - 2, columns - 2, grid, updateGrid, 1, cutoff);
+		boolean change = pool.invoke(task);
 
-		// checking if grid has changed
-		for (int i = 1; i < rows - 1; i++) {
-			for (int j = 1; j < columns - 1; j++) {
-				if (grid[i][j] != updateGrid[i][j]) {
-					change = true;
-				}
-			}
-		}
 		// end nested for
 		if (change)
 

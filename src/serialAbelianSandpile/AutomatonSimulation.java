@@ -9,7 +9,7 @@ import java.io.IOException;
  * Michelle Kuttel 2024, University of Cape Town
  * Adapted from "Abelian Sandpile Simulation"
  * Peachy Parallel Assignments (EduPar 2022)" 
- * developed by Bu\:cker, Casanova and Da Silva  (∗Institute for Computer Science, Friedrich Schiller University Jena, Jena, Germany)
+ * developed by Bu\:cker, Casanova and Da Silva  (Institute for Computer Science, Friedrich Schiller University Jena, Jena, Germany)
  */
 
 class AutomatonSimulation {
@@ -36,7 +36,8 @@ class AutomatonSimulation {
 				String[] dimensions = line.split(",");
 				int width = Integer.parseInt(dimensions[0]);
 				int height = Integer.parseInt(dimensions[1]);
-				System.out.printf("Rows: %d, Columns: %d\n", width, height); // Do NOT CHANGE - you must ouput this
+				System.out.printf("Rows: %d, Columns: %d\n", width, height); // Do NOT CHANGE
+				// - you must ouput this
 
 				array = new int[height][width];
 				int rowIndex = 0;
@@ -97,6 +98,6 @@ class AutomatonSimulation {
 		// the parallel versions System.out.printf("\t Rows: %d, Columns: %d\n",
 		// simulationGrid.getRows(), simulationGrid.getColumns());
 		System.out.printf("Number of steps to stable state: %d \n", counter);
-		System.out.printf("Time: %d ms\n", endTime - startTime); /* Total computation time */
+		System.out.printf("Time: %d ms, ", endTime - startTime); /* Total computation time */
 	}
 }

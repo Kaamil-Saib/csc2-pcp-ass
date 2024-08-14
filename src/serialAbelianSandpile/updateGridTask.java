@@ -1,47 +1,54 @@
 package serialAbelianSandpile;
 
-import java.util.concurrent.RecursiveAction;
+import java.util.concurrent.RecursiveTask;
 
-public class updateGridTask extends RecursiveAction {
+public class updateGridTask extends RecursiveTask<Boolean> {
 
-    private static final int THRESHOLD = 16;
+    private final int THRESHOLD;
     private int rows;
     private int columns;
     private int[][] grid;
     private int[][] updateGrid;
-    private int start;
-    private int end;
+    private int offset;
+    private boolean change;
 
-    public updateGridTask(int rows, int columns, int[][] grid, int[][] updateGrid, int start, int end) {
+    public updateGridTask(int rows, int columns, int[][] grid, int[][] updateGrid, int offset, int THRESHOLD) {
         this.rows = rows;
         this.columns = columns;
         this.grid = grid;
         this.updateGrid = updateGrid;
-        this.start = start;
-        this.end = end;
+        this.offset = offset;
+        change = false;
+        this.THRESHOLD = THRESHOLD;
     }
 
     @Override
-    public void compute() {
+    public Boolean compute() {
         // do not update border
-        if (end - start <= THRESHOLD) {
-            for (int i = 1; i < rows - 1; i++) {
-                for (int j = 1; j < columns - 1; j++) {
+        if (columns < THRESHOLD) {
+            for (int i = 1; i <= rows; i++) {
+                for (int j = offset; j < columns + offset; j++) {
                     updateGrid[i][j] = (grid[i][j] % 4) +
                             (grid[i - 1][j] / 4) +
                             grid[i + 1][j] / 4 +
                             grid[i][j - 1] / 4 +
                             grid[i][j + 1] / 4;
+                    if (grid[i][j] != updateGrid[i][j]) {
+                        change = true;
+                    }
                 }
             }
+            return change;
         } else {
-            int middle = (start + end) / 2;
-            updateGridTask leftTask = new updateGridTask(rows, columns, grid, updateGrid, start, middle);
-            updateGridTask rightTask = new updateGridTask(rows, columns, grid, updateGrid, middle, end);
+            int middle = columns / 2;
+            updateGridTask leftTask = new updateGridTask(rows, middle, grid, updateGrid, offset, THRESHOLD);
+            updateGridTask rightTask = new updateGridTask(rows, columns - middle, grid, updateGrid, middle + offset,
+                    THRESHOLD);
 
             leftTask.fork();
-            rightTask.compute();
-            leftTask.join();
+            boolean rightBool = rightTask.compute();
+            boolean leftBool = leftTask.join();
+            return rightBool || leftBool;
         }
 
     }
